@@ -5,7 +5,7 @@ services:
 
     asterisk: 
         build:
-            context: ./asterisk
+            context: ../asterisk
             dockerfile: Dockerfile
         image: asterisk:latest
         environment:
