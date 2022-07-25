@@ -36,7 +36,9 @@ RUN echo ${TZ} > /etc/localtime && \
 RUN wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-19.5.0.tar.gz && \
     tar xzvf asterisk-19.5.0.tar.gz && \
     rm asterisk-19.5.0.tar.gz
+
 WORKDIR /usr/src/asterisk-19.5.0
+
 RUN ./contrib/scripts/get_mp3_source.sh && \
     ./contrib/scripts/install_prereq install && \
     ./configure --libdir=/usr/lib64 --with-jansson-bundled --with-pjproject-bundled
@@ -69,6 +71,22 @@ RUN groupadd asterisk && \
     sed -i 's/;run/run/g' /etc/asterisk/asterisk.conf && \
     ldconfig
 
+# Install Alembic
+RUN apt-get install -y python3-pip && \
+    pip install alembic && \
+    pip install mysqlclient
+
+COPY ./ custom
+
+# Realtime Database Configuration 
+RUN cat custom/config/extconfig.conf >> /etc/asterisk/extconfig.conf && \
+    cat custom/config/pjsip.conf >> /etc/asterisk/pjsip.conf && \
+    cat custom/config/sorcery.conf >> /etc/asterisk/sorcery.conf && \
+    cat custom/config/modules.conf >> /etc/asterisk/modules.conf
+
+# Set Limit udp ports
+RUN sed -i "s/rtpend=20000/rtpend=10500/g" /etc/asterisk/rtp.conf
+
 RUN service asterisk start
 
-CMD ["/usr/sbin/asterisk", "-vvvvvvvvdddf"]
+CMD sh custom/scripts/initiator.sh && /usr/sbin/asterisk -vvvvvvdddf

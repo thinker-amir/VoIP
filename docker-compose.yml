@@ -1,5 +1,5 @@
 # For more information: https://laravel.com/docs/sail
-version: '3'
+version: "3.7"
 
 services:
 
@@ -8,10 +8,21 @@ services:
             context: ./asterisk
             dockerfile: Dockerfile
         image: asterisk:latest
+        environment:
+            DB_HOST: "${DB_HOST}"
+            DB_PORT: "${DB_PORT}"
+            DB_DATABASE: '${DB_DATABASE}'
+            DB_USERNAME: '${DB_USERNAME}'
+            DB_PASSWORD: '${DB_PASSWORD}'
+            TZ: '${TIME_ZONE}'
         networks:
             - sail
-        environment:
-            TZ: '${TIME_ZONE}'
+        ports:
+            - 5060:5060
+            - 5060:5060/udp
+            - 5061:5061
+            - 5061:5061/udp
+            - 10000-10500:10000-10500/udp
 
     laravel:
         build:
