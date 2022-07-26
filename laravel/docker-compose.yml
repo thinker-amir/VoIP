@@ -24,6 +24,17 @@ services:
             - 5061:5061/udp
             - 10000-10500:10000-10500/udp
 
+    sipp: 
+        build:
+            context: ../sipp
+            dockerfile: Dockerfile
+        image: sipp:latest
+        tty: true
+        environment:
+            TZ: '${TIME_ZONE}'
+        networks:
+            - sail
+
     laravel:
         build:
             context: ./vendor/laravel/sail/runtimes/8.1
@@ -50,7 +61,7 @@ services:
             - mysql
 
     mysql:
-        image: 'mysql/mysql-server:8.0'
+        image: 'mariadb'
         ports:
             - '${FORWARD_DB_PORT:-3306}:3306'
         environment:

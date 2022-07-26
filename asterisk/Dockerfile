@@ -52,7 +52,7 @@ RUN make menuselect.makeopts && menuselect/menuselect \
     --enable eagi-test \
     --enable eagi-sphinx-test \
     --enable jukebox.agi \
-    --enable res_config_mysql menuselect.makeopts
+    menuselect.makeopts
 
 RUN make && make install && \
     make samples && \
@@ -79,10 +79,14 @@ RUN apt-get install -y python3-pip && \
 COPY ./ custom
 
 # Realtime Database Configuration 
-RUN cat custom/config/extconfig.conf >> /etc/asterisk/extconfig.conf && \
+RUN apt-get -y install odbc-mariadb && \
+    cat custom/config/extconfig.conf >> /etc/asterisk/extconfig.conf && \
     cat custom/config/pjsip.conf >> /etc/asterisk/pjsip.conf && \
     cat custom/config/sorcery.conf >> /etc/asterisk/sorcery.conf && \
-    cat custom/config/modules.conf >> /etc/asterisk/modules.conf
+    cat custom/config/modules.conf >> /etc/asterisk/modules.conf && \
+    cat custom/config/cdr_adaptive_odbc.conf >> /etc/asterisk/cdr_adaptive_odbc.conf
+
+RUN cat custom/config/extensions.conf >> /etc/asterisk/extensions.conf
 
 # Set Limit udp ports
 RUN sed -i "s/rtpend=20000/rtpend=10500/g" /etc/asterisk/rtp.conf
