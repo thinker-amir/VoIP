@@ -25,14 +25,15 @@ RUN apt-get install -y \
     libxml2-dev \
     uuid-dev \ 
     unixodbc \
-    unixodbc-dev
+    unixodbc-dev \
+    odbc-mariadb
 
 # Set Timezone
 RUN echo ${TZ} > /etc/localtime && \
     apt-get install -y tzdata &&\
     dpkg-reconfigure --frontend noninteractive tzdata
 
-# Install Asterisk
+# Clone Asterisk
 RUN wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-19.5.0.tar.gz && \
     tar xzvf asterisk-19.5.0.tar.gz && \
     rm asterisk-19.5.0.tar.gz
@@ -47,6 +48,30 @@ RUN ./contrib/scripts/get_mp3_source.sh && \
 RUN make menuselect.makeopts && menuselect/menuselect \
     --enable chan_ooh323 \
     --enable format_mp3 \
+    --enable CORE-SOUNDS-EN-WAV  \
+    --enable CORE-SOUNDS-EN-ULAW  \
+    --enable CORE-SOUNDS-EN-ALAW  \
+    --enable CORE-SOUNDS-EN-GSM  \
+    --enable CORE-SOUNDS-EN-G729  \
+    --enable CORE-SOUNDS-EN-G722  \
+    --enable CORE-SOUNDS-EN-SLN16  \
+    --enable CORE-SOUNDS-EN-SIREN7  \
+    --enable CORE-SOUNDS-EN-SIREN14  \
+    --enable MOH-OPSOUND-WAV  \
+    --enable MOH-OPSOUND-ULAW  \
+    --enable MOH-OPSOUND-ALAW  \
+    --enable MOH-OPSOUND-GSM  \
+    --enable MOH-OPSOUND-G729  \
+    --enable MOH-OPSOUND-G722  \
+    --enable MOH-OPSOUND-SLN16  \
+    --enable MOH-OPSOUND-SIREN7  \
+    --enable MOH-OPSOUND-SIREN14  \
+    --enable EXTRA-SOUNDS-EN-WAV  \
+    --enable EXTRA-SOUNDS-EN-ULAW  \
+    --enable EXTRA-SOUNDS-EN-ALAW  \
+    --enable EXTRA-SOUNDS-EN-GSM  \
+    --enable EXTRA-SOUNDS-EN-G729  \
+    --enable EXTRA-SOUNDS-EN-G722  \
     --enable app_macro \
     --enable agi-test.agi \
     --enable eagi-test \
@@ -54,6 +79,7 @@ RUN make menuselect.makeopts && menuselect/menuselect \
     --enable jukebox.agi \
     menuselect.makeopts
 
+# Install Asterisk
 RUN make && make install && \
     make samples && \
     make config
@@ -78,18 +104,8 @@ RUN apt-get install -y python3-pip && \
 
 COPY ./ custom
 
-# Realtime Database Configuration 
-RUN apt-get -y install odbc-mariadb && \
-    cat custom/config/extconfig.conf >> /etc/asterisk/extconfig.conf && \
-    cat custom/config/pjsip.conf >> /etc/asterisk/pjsip.conf && \
-    cat custom/config/sorcery.conf >> /etc/asterisk/sorcery.conf && \
-    cat custom/config/modules.conf >> /etc/asterisk/modules.conf && \
-    cat custom/config/cdr_adaptive_odbc.conf >> /etc/asterisk/cdr_adaptive_odbc.conf
-
-RUN cat custom/config/extensions.conf >> /etc/asterisk/extensions.conf
-
-# Set Limit udp ports
-RUN sed -i "s/rtpend=20000/rtpend=10500/g" /etc/asterisk/rtp.conf
+# Append custom configuration to asterisk config files
+RUN for file in `ls ./custom/config/*conf`; do cat $file >> /etc/asterisk/`basename $file`; done
 
 RUN service asterisk start
 

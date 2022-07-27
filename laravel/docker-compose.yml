@@ -9,20 +9,13 @@ services:
             dockerfile: Dockerfile
         image: asterisk:latest
         environment:
-            DB_HOST: "${DB_HOST}"
-            DB_PORT: "${DB_PORT}"
+            DB_HOST: "${HOST_ADDRESS}"
+            DB_PORT: "${FORWARD_DB_PORT}"
             DB_DATABASE: '${DB_DATABASE}'
             DB_USERNAME: '${DB_USERNAME}'
             DB_PASSWORD: '${DB_PASSWORD}'
             TZ: '${TIME_ZONE}'
-        networks:
-            - sail
-        ports:
-            - 5060:5060
-            - 5060:5060/udp
-            - 5061:5061
-            - 5061:5061/udp
-            - 10000-10500:10000-10500/udp
+        network_mode: host
 
     sipp: 
         build:
