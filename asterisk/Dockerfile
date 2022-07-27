@@ -105,7 +105,8 @@ RUN apt-get install -y python3-pip && \
 COPY ./ custom
 
 # Append custom configuration to asterisk config files
-RUN for file in `ls ./custom/config/*conf`; do cat $file >> /etc/asterisk/`basename $file`; done
+RUN sed -i 's/\[threadpool\]/;[threadpool]/' /etc/asterisk/stasis.conf && \
+    for file in `ls ./custom/config/*conf`; do cat $file >> /etc/asterisk/`basename $file`; done
 
 RUN service asterisk start
 
