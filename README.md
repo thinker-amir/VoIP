@@ -1,7 +1,20 @@
-# Asterisk VoIP server (PBX) with SIPp and Laravel
+# VoIP Application
 ---
 ### INTRODUCTION 
-A Dockeriezed Asterisk server (PBX) with SIPp and Laravel, It implements Asterisk RealTime (config, cdr) and work with MariaDB. It uses SIPp to run stress tests and Laravel to Design the structure.
+A VoIP application, that controls and manages Asterisk (PBX). 
+
+### GOALS
+Handle 6000 registered extensions
+Handle 1800 concurrent calls
+High Availability
+
+### TOOLS USED
+**[Laravel](https://laravel.com/)** - is a web application framework with expressive, elegant syntax
+**[Mysql](https://www.mysql.com/)** - is an open-source relational database management system
+**[Asterisk](https://www.asterisk.org/)** - an open-source framework for building communications applications
+**[Alembic](https://alembic.sqlalchemy.org/)** - is a lightweight database migration tool for usage with the SQLAlchemy Database
+**[SIPp](http://sipp.sourceforge.net/)** - is a free Open Source test tool / traffic generator for the SIP protocol
+**[Docker](https://www.docker.com/)** - is a set of platform as a service products that use OS-level virtualization to deliver software in packages called containers
 
 ### RQUIREMENTS
 * Docker 20.10 or higher
@@ -35,7 +48,7 @@ Config your .env File (example)
 vi .env
 ```
 Set Some Import Variables
-> HOST_ADDRESS=192.168.8.117  # Change it with your real docker host ip or domain
+> HOST_ADDRESS=  # Set your host ip or domain
 > ...
 > DB_HOST=mysql           
 > DB_PORT=3306            
@@ -51,17 +64,38 @@ Set Some Import Variables
 ./vendor/bin/sail up -d
 ```
 Insert Defaults to Database
+create `6000` endpoints (extensions) and sipp extensions for test concurrent calls
 ```bash
 ./vendor/bin/sail exec laravel php artisan db:seed
 ```
 
 ### RUN Stress Testing with SIPp
-```bash
-sail exec sipp sipp -sn uac -s 1 192.168.8.117 -d 100000 -l 1800 -m 1800 -r 20
-```
-**Change 192.168.8.117 to your docker host address**
+`Options explanations`
+| Syntax | Description |
+| ----------- | ----------- |
+| -s | Exten |
+| -d | Controls the length of calls in msec |
+| -l | Limit simultaneous calls | 
+| -m | Stop and exit after specified tests count | 
+| -r | Scenario execution rate | 
 See [SIPp cheatsheet](https://tomeko.net/other/sipp/sipp_cheatsheet.php?lang=en) for more information.
+#### REGISTER `6000` EXTENSIONS
+```bash
+sail exec sipp  sipp <HOST_ADDRESS> -sf REGISTER_SUBSCRIBE_client.xml -inf REGISTER_SUBSCRIBE_client.csv -m 6000 -l 200 -r 200 -d 10000
+```
+Change <HOST_ADDRESS> to your docker host address
 
-### Reference Performance Tuning
+You should see the result like following picture
+![alt text](screenshots/extensions.png "Title")
+#### CREATE `1800` CONCURRENT CALLS
+```bash
+sail exec sipp sipp -s 1 <HOST_ADDRESS> -d 20000 -l 1800 -m 1800 -r 200
+```
+Change <HOST_ADDRESS> to your docker host address
+
+You should see the result like following picture
+![alt text](screenshots/concurrent.png "Title")
+
+### Reference Asterisk Performance Tuning
 Tune performance according to Asterisk's article guide
 See [this link](https://wiki.asterisk.org/wiki/display/AST/Performance+Tuning) for more information.

@@ -25,6 +25,8 @@ services:
         tty: true
         environment:
             TZ: '${TIME_ZONE}'
+        volumes:
+            - ../sipp/scenarios:/usr/src/SIPp
         networks:
             - sail
 

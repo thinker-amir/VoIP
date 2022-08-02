@@ -17,14 +17,8 @@ class EndpointSeeder extends Seeder
      */
     public function run()
     {
-
-        PsEndpoint::factory()->create([
-            'id' => 'sipp',
-            'aors' => null,
-            'auth' => null,
-        ]);
-
-        PsEndpoint::factory(10)->create();
+        // Create extensions from 1000 to 7000
+        PsEndpoint::factory(6000)->create();
         $endpoints = PsEndpoint::all();
 
         foreach ($endpoints as $endpoint) {
@@ -39,6 +33,13 @@ class EndpointSeeder extends Seeder
                 'max_contacts' => 1,
             ]);
         }
+
+        // Create sipp extensions for testing concurrent calls
+        PsEndpoint::factory()->create([
+            'id' => 'sipp',
+            'aors' => null,
+            'auth' => null,
+        ]);
 
     }
 }

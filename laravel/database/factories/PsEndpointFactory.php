@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PsEndpointFactory extends Factory
 {
+    private static $exten = 1000;
     /**
      * Define the model's default state.
      *
@@ -16,12 +17,12 @@ class PsEndpointFactory extends Factory
      */
     public function definition()
     {
-        $exten = fake()->randomNumber(3, true);
+        self::$exten++;
         return [
-            'id' => $exten,
+            'id' => self::$exten,
             'transport' => 'transport-udp',
-            'aors' => $exten,
-            'auth' => $exten,
+            'aors' => self::$exten,
+            'auth' => self::$exten,
             'context' => 'testing',
             'disallow' => 'all',
             'allow' => 'ulaw',
