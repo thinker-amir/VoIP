@@ -1,28 +1,28 @@
 # VoIP Application
 ---
 ### INTRODUCTION 
-A VoIP application, that controls and manages Asterisk (PBX). 
+A VoIP application, that controls and manages Asterisk (PBX).   
 
 ### GOALS
-Handle 6000 registered extensions
-Handle 1800 concurrent calls
-High Availability
+Handle 6000 registered extensions  
+Handle 1800 concurrent calls  
+High Availability   
 
 ### TOOLS USED
-**[Laravel](https://laravel.com/)** - is a web application framework with expressive, elegant syntax
-**[Mysql](https://www.mysql.com/)** - is an open-source relational database management system
-**[Asterisk](https://www.asterisk.org/)** - an open-source framework for building communications applications
-**[Alembic](https://alembic.sqlalchemy.org/)** - is a lightweight database migration tool for usage with the SQLAlchemy Database
-**[SIPp](http://sipp.sourceforge.net/)** - is a free Open Source test tool / traffic generator for the SIP protocol
-**[Docker](https://www.docker.com/)** - is a set of platform as a service products that use OS-level virtualization to deliver software in packages called containers
+**[Laravel](https://laravel.com/)** - is a web application framework with expressive, elegant syntax  
+**[Mysql](https://www.mysql.com/)** - is an open-source relational database management system  
+**[Asterisk](https://www.asterisk.org/)** - an open-source framework for building communications applications  
+**[Alembic](https://alembic.sqlalchemy.org/)** - is a lightweight database migration tool for usage with the SQLAlchemy Database  
+**[SIPp](http://sipp.sourceforge.net/)** - is a free Open Source test tool / traffic generator for the SIP protocol  
+**[Docker](https://www.docker.com/)** - is a set of platform as a service products that use OS-level virtualization to deliver software in packages called containers  
 
 ### RQUIREMENTS
-* Docker 20.10 or higher
-* docker-compose 2.7 or higher
-* Firewall Configuration
+* Docker 20.10 or higher    
+* docker-compose 2.7 or higher    
+* Firewall Configuration   
 
-**Open required ports**
-You must open these ports on the docker server host. Because Asterisk service in docker-compose.yml uses Host network and docker can't open a large number of ports in bridge mode yet.
+**Open required ports**   
+You must open these ports on the docker server host. Because Asterisk service in docker-compose.yml uses Host network and docker can't open a large number of ports in bridge mode yet.   
 ```bash
 sudo ufw allow 5060,5061/tcp
 sudo ufw allow 5060,5061/udp
@@ -63,15 +63,15 @@ Set Some Import Variables
 ```bash
 ./vendor/bin/sail up -d
 ```
-Insert Defaults to Database
-create `6000` endpoints (extensions) and sipp extensions for test concurrent calls
+Insert Defaults to Database   
+create `6000` endpoints (extensions) and sipp extensions for test concurrent calls   
 ```bash
 ./vendor/bin/sail exec laravel php artisan db:seed
 ```
 
 ### RUN Stress Testing with SIPp
 `Options explanations`
-| Syntax | Description |
+| Option | Description |
 | ----------- | ----------- |
 | -s | Exten |
 | -d | Controls the length of calls in msec |
